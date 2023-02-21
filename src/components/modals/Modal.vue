@@ -1,53 +1,64 @@
 <template lang="pug">
-.board
-  p.title Simple Message Board
-  .button
-    SimpleButton(text="New Message" @click="openModal")
-  .list 
-    List
-  Modal(ref="modal")
+.modal-area(v-show="isActive")
+  .modal-bg(@click="close")
+  .modal-wrapper
+    .modal-content
+      .modal-label
+        label Name
+      .modal-form
+        input(v-model="name", type="text")
+      .modal-label
+        label Message
+      .modal-form
+        input.input(v-model="message", type="text")
+      .buttons
+        button.cancel(@click="close") CANCEL
+        SpinnerButton(text="POST" @click="click2" ref="spinnerButton")
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 
-import SimpleButton from '@/components/buttons/SimpleButton.vue'
-import Spinner from '@/components/indicators/Spinner.vue'
-import List from '@/components/lists/List.vue'
-import Modal from '@/components/modals/Modal.vue'
+import SpinnerButton from '@/components/buttons/SpinnerButton.vue'
 
 export default defineComponent({
   components: {
-    SimpleButton,
-    Spinner,
-    List,
-    Modal,
+    SpinnerButton,
   },
 
   setup() {
-    const modal = ref<InstanceType<typeof Modal>>()
+    const spinnerButton = ref<InstanceType<typeof SpinnerButton>>()
+    const name = ref('')
+    const message = ref('')
+    const isActive = ref(false)
 
-    const openModal = () => {
-      modal.value?.open()
+    const open = () => {
+      isActive.value = true
+    }
+
+    const close = () => {
+      isActive.value = false
+    }
+
+    const click2 = () => {
+      spinnerButton.value?.progress()
+      // spinnerButton.value?.onCompleted()
     }
 
     return {
-      modal,
-      openModal,
+      click2,
+      spinnerButton,
+      name,
+      message,
+      isActive,
+      open,
+      close,
     }
   },
 })
 </script>
 
 <style lang="scss" scoped>
-.button {
-  margin-bottom: 15px;
-}
-.title {
-  font-weight: bold;
-  font-size: 30px;
-  color: black;
-}
 .modal-area {
   position: fixed;
   z-index: 2;
@@ -68,7 +79,7 @@ export default defineComponent({
   text-align: right;
 }
 .list {
-  width: 36%;
+  width: 60%;
   margin: auto;
 }
 
